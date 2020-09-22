@@ -1,0 +1,22 @@
+{
+    "name": "the-tipper",
+    "version": "1.0.0",
+    "engines": {
+        "node": "12.18.3",
+        "npm": "6.14.6"
+    },
+    "description": "Helps the user know how much to tip",
+    "main": "./src/server.js",
+    "scripts": {
+        "start": "node ./src/server.js",
+        "pretest": "eslint ./src --fix",
+        "test": "echo \"Test Complete\""
+    },
+    "author": "Kalen Oyphanith",
+    "license": "UNLICENSED",
+    "devDependencies": {
+        "eslint": "^7.9.0",
+        "eslint-config-airbnb": "^18.2.0",
+        "eslint-plugin-import": "^2.22.0"
+    }
+}

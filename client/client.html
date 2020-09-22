@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>The Tipper</title>
+    <!--    <link rel="stylesheet" type="text/css" href="/style.css">-->
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.34/browser.min.js"></script>
+    <script type="text/babel">
+
+        const parseJSON = (xhr, content) => {
+      //parse response
+      const obj = JSON.parse(xhr.response);
+      console.log(obj);
+      
+      if(obj.message) {
+        const p = document.createElement('p');
+        p.innerHTML = `<h3>Location: ${locationField.value}</h3> <p><b>Description: </b>${reviewField.value}</p>`;
+        content.appendChild(p);
+          
+        console.log(obj.message);
+      }
+      
+      if(obj.reviews) {
+        const reviewList = document.createElement('p');
+        const reviews = JSON.stringify(obj.reviews);
+        reviewList.textContent = reviews;
+        content.appendChild(reviewList);
+          console.log(reviewList);
+      }
+            
+    };
+
+    const handleResponse = (xhr, parseResponse) => {
+      const content = document.querySelector('#content');
+      
+      switch(xhr.status) {
+        case 200: 
+          console.log("Success");
+          break;
+        case 201: 
+          console.log("Created!");
+          break;
+        case 204: 
+          console.log("Updated (No Content)");
+          return;
+        case 400: 
+          console.log("Bad Request"); 
+          break;        
+        case 404: 
+          console.log("Not Found");
+          break;
+        default: 
+          console.log("Error code not implemented by client.");
+          break;
+      }
+
+        if(parseResponse === true) { // if true, parse JSON
+            parseJSON(xhr, content);
+        } 
+
+    };
+        //function to send our post request
+    const sendPost = (e, reviewForm) => {
+      //grab the forms action (url)
+      const nameAction = reviewForm.getAttribute('action'); // " /addReview "
+      const nameMethod = reviewForm.getAttribute('method'); // POST
+      
+      //grab the form's name and age fields so we can check user input
+      const locationField = reviewForm.querySelector('#locationField');
+      const reviewField = reviewForm.querySelector('#reviewField');
+      
+      const xhr = new XMLHttpRequest();
+      xhr.open(nameMethod, nameAction); // (method and url)
+      
+      // type of info we ask for if possible
+      xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+      //set our requested response type in hopes of a JSON response
+      xhr.setRequestHeader ('Accept', 'application/json');
+      
+      xhr.onload = () => handleResponse(xhr, true);
+
+      const formData = `location=${locationField.value}&review=${reviewField.value}`;
+      xhr.send(formData);
+    
+      e.preventDefault();
+      return false;
+    };
+
+    const getBill = (e, billInfo) => {
+      const billAmount = document.querySelector("#billField").value;
+      const tipPercent = document.querySelector("#tipField").value;
+      const numPeople = document.querySelector("#numPeopleField").value;
+      const p = document.createElement('p');
+
+    
+      let totalTip = billAmount * (tipPercent / 100);
+      //console.log("total tip: " + totalTip.toFixed(2));
+    
+        let totalBill = (parseFloat(billAmount) + totalTip);
+        //console.log("total bill: " + totalBill.toFixed(2));
+        
+        let splitBill;
+        
+      if (numPeople > 1){
+          //console.log("total bill split: " + totalBill);
+          splitBill = totalBill / numPeople;
+          p.innerHTML = `<p>Split bill with tip: ${splitBill.toFixed(2)}</p>`;
+          console.log("split: " + splitBill.toFixed(2));
+      } else {
+          p.innerHTML = `<p>Total Bill with tip: ${totalBill.toFixed(2)}</p>`;
+      }
+        
+        content.appendChild(p);
+
+        
+      e.preventDefault();
+      return false;
+        
+    };
+
+    const init = () => {
+          // post request
+      const reviewForm = document.querySelector('#reviewForm');
+      const addReview = (e) => sendPost(e, reviewForm); 
+      reviewForm.addEventListener('submit', addReview);
+        
+      const billInfo = document.querySelector('#billInfo');
+      const getTip = (e) => getBill(e, billInfo);
+      billInfo.addEventListener('submit', getTip);
+    };
+
+    window.onload = init;
+    </script>
+</head>
+
+<body>
+
+    <section id="info">
+        <h1>The Tipper</h1>
+
+        <form id="billInfo" action="/getTip" method="get">
+
+            <label for="bill">Bill amount: </label>
+            <input id="billField" type="number" name="bill" />
+
+            <label for="tip">Tip: </label>
+            <input id="tipField" type="number" name="tip" min="5" max="30" step="1" />
+
+            <label for="numPeople">Split: </label>
+            <input id="numPeopleField" type="number" name="numPeople" min="0" max="30" />
+
+            <input type="submit" value="Get Tip" />
+        </form>
+
+        <h3>POST Status Code Tests</h3>
+        <form id="reviewForm" action="/addReview" method="post">
+
+            <label for="location">Restaurant Name: </label>
+            <input id="locationField" type="text" name="location" />
+
+            <label for="review">Review description: </label>
+            <input id="reviewField" type="text" name="review" />
+
+            <input type="submit" value="Add Review" />
+        </form>
+    </section>
+
+    <section id="content">
+        <h2>Reviews:</h2>
+    </section>
+
+</body></html>
