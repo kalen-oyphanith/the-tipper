@@ -1,0 +1,105 @@
+/*https://www.w3schools.com/css/css_form.asp.dot */
+/*https://www.w3docs.com/snippets/css/how-to-remove-and-style-the-border-outline-around-text-input-boxes-in-google-chrome.html*/
+/*https://fonts.google.com/specimen/Epilogue?preview.text=The%20Tipper&preview.text_type=custom&sidebar.open=true&selection.family=Epilogue:wght@300;500*/
+
+<link href="https://fonts.googleapis.com/css2?family=Epilogue:wght@300;500&display=swap"rel="stylesheet" > * {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0% 10% 0% 10%;
+    background-color: #F5F5F5;
+}
+
+.dot {
+    height: 12px;
+    width: 12px;
+    background-color: #4CAF50;
+    border-radius: 50%;
+    display: inline-block;
+    margin: 2px;
+}
+
+ul {
+    list-style-type: none;
+}
+
+textarea {
+    width: 40%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    resize: vertical;
+    font-family: 'Epilogue', sans-serif;
+}
+
+label {
+    padding: 12px 12px 12px 0;
+    display: inline-block;
+    font-family: 'Epilogue', sans-serif;
+}
+
+input {
+    color: black;
+    padding: 12px 20px;
+    border-top-style: hidden;
+    border-right-style: hidden;
+    border-left-style: hidden;
+    border-bottom-style: groove;
+    background-color: #eee;
+    cursor: pointer;
+    border: none;
+    text-decoration: none;
+    margin: 4px 2px;
+    border-radius: 12px;
+}
+
+input[type=submit]:hover {
+    background-color: #45a049;
+}
+
+#content {
+    border-radius: 5px;
+    background-color: green;
+    padding: 20px;
+}
+
+select {
+    padding: 10px 10px;
+    border: none;
+    border-radius: 12px;
+    background-color: #f1f1f1;
+    float: clear;
+    font-family: 'Epilogue', sans-serif;
+}
+
+input[type=submit] {
+    background-color: #4CAF50;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    text-decoration: none;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 12px;
+}
+
+input[type=submit]:hover {
+    background-color: #45a049;
+}
+
+h2 {
+    font-size: 1.5em;
+    font-family: 'Epilogue', sans-serif;
+}
+
+p {
+    font-family: 'Epilogue', sans-serif;
+    font-size: 1.2em;
+}
+
+h1 {
+    /*    color: #DAF7A6;*/
+    font-size: 2em;
+    font-family: 'Epilogue', sans-serif;
+}
