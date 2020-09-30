@@ -20,24 +20,27 @@
       } 
         // https://www.w3schools.com/howto/howto_css_circles.asp    
         if(obj.reviews) {
+            
         const nameobj = document.querySelector('#nameField').value;
         const objName = obj.reviews[nameobj].name;
         const objDescription = obj.reviews[nameobj].description;
             
         const reviewContent = document.querySelector('#reviewContent');     
+        const h2 = document.createElement('h2');
         const li = document.createElement('li');
         const p = document.createElement('p');
-        li.innerHTML = `<hr><h2><b>${nameobj}</b></h2> <p>${objDescription}</p>`;
-        const para = document.querySelector('#starRating');     
+        h2.innerHTML = `<hr><b>${nameobj}</b>`;
+        li.innerHTML = `${objDescription}`;
+        p.innerHTML = `Reviewed on ${dateString}<hr>`;
 
         const rating = document.querySelector('#rating').value;    
-        
+
         for (let i = 0; i < rating; i++ ) {
             const span = document.createElement('span');
             span.innerHTML = `<span class="dot"></span>`;
             reviewContent.appendChild(span);
         }
-        p.innerHTML = `<p>Reviewed on ${dateString}</p><hr>`;
+        reviewContent.appendChild(h2);        
         reviewContent.appendChild(li);        
         reviewContent.appendChild(p);        
       }
@@ -116,7 +119,7 @@
 
       const formData = `name=${nameField.value}&description=${descriptionField.value}`;
       xhr.send(formData);
-    
+
       e.preventDefault();
       return false;
 
@@ -129,7 +132,6 @@
       xhr.onload = () => handleResponse(xhr, true);
       
       xhr.send();
-    
       e.preventDefault();
       return false;
     };
@@ -150,6 +152,7 @@
       const billInfo = document.querySelector('#billInfo');
       const getTip = (e) => getBill(e, billInfo);
       billInfo.addEventListener('submit', getTip);
+        
     }
 
     window.onload = init;
@@ -207,7 +210,6 @@
 
         <ul id="reviewContent">
         </ul>
-
     </section>
 </body>
 
