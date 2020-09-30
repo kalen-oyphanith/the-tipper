@@ -13,7 +13,7 @@
       let d = new Date();
       let dateString = `${d.getMonth() + 1}/${d.getDate()}/${d.getFullYear() % 100}`;
     
-      if(obj.message) { // myData message
+      if(obj.message) { // myData message status
         const p = document.createElement('p');
         p.textContent = `${obj.message}`;
         reviewContent.appendChild(p);
@@ -24,22 +24,25 @@
         const nameobj = document.querySelector('#nameField').value;
         const objName = obj.reviews[nameobj].name;
         const objDescription = obj.reviews[nameobj].description;
-            
+        console.log(obj.reviews);
+        console.log(obj.reviews[nameobj].length);
+            //for(let i = 0; i< obj.reviews.length)
         const reviewContent = document.querySelector('#reviewContent');     
+        const hr = document.createElement('hr');
         const h2 = document.createElement('h2');
         const li = document.createElement('li');
         const p = document.createElement('p');
-        h2.innerHTML = `<hr><b>${nameobj}</b>`;
+        h2.innerHTML = `<b>${nameobj}</b>`;
         li.innerHTML = `${objDescription}`;
-        p.innerHTML = `Reviewed on ${dateString}<hr>`;
-
+        p.innerHTML = `Reviewed on ${dateString}`;
+        
         const rating = document.querySelector('#rating').value;    
 
         for (let i = 0; i < rating; i++ ) {
-            const span = document.createElement('span');
-            span.innerHTML = `<span class="dot"></span>`;
-            reviewContent.appendChild(span);
+            h2.innerHTML += `<span class="dot"></span>`;
         }
+            
+        reviewContent.appendChild(hr);        
         reviewContent.appendChild(h2);        
         reviewContent.appendChild(li);        
         reviewContent.appendChild(p);        
@@ -73,6 +76,8 @@
 
         if(parseResponse) {
             parseJSON(xhr, reviewContent);
+        } else {
+            console.log('Meta Data Recieved');
         }
     };
 
@@ -126,23 +131,26 @@
     };
 
     const updateGet = (e, nameAction) => {
+      // Head request
+      const xhrHead = new XMLHttpRequest();
+      xhrHead.open("HEAD", nameAction); 
+      xhrHead.setRequestHeader('Accept', 'application/json');
+      xhrHead.onload = () => handleResponse(xhrHead, false);
+      xhrHead.send();
+
       const xhr = new XMLHttpRequest();
       xhr.open("GET", nameAction); 
       xhr.setRequestHeader('Accept', 'application/json');
       xhr.onload = () => handleResponse(xhr, true);
-      
       xhr.send();
+    
       e.preventDefault();
       return false;
     };
 
     const init = () => {
       const reviewForm = document.querySelector('#reviewForm');
-      const addReview = (e) => {
-          sendPost(e, reviewForm);
-
-      };
-      
+      const addReview = (e) => sendPost(e, reviewForm);
       reviewForm.addEventListener('submit', addReview);
         
       const userForm = document.querySelector('#userForm');
@@ -206,8 +214,6 @@
         </form>
     </section>
     <section>
-        <div id="starRating"> </div>
-
         <ul id="reviewContent">
         </ul>
     </section>
