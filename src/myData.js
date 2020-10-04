@@ -1,5 +1,4 @@
 const reviews = {};
-// const tips = {};
 
 const respondJSON = (request, response, status, object) => {
   const headers = {
@@ -43,10 +42,10 @@ const getReviewsMeta = (request, response) => {
 
 const addReview = (request, response, body) => {
   const responseJSON = {
-    message: 'The location and description are both required.',
+    message: 'The location, rating, and description are both required.',
   };
 
-  if (!body.name || !body.description) {
+  if (!body.name || !body.description || !body.rating || !body.date) {
     responseJSON.id = 'missingParams';
     return respondJSON(request, response, 400, responseJSON);
   }
@@ -60,8 +59,9 @@ const addReview = (request, response, body) => {
     reviews[body.name] = {};
     reviews[body.name].name = body.name;
   }
-
   reviews[body.name].description = body.description;
+  reviews[body.name].rating = body.rating;
+  reviews[body.name].date = body.date;
 
   if (responseCode === 201) {
     responseJSON.message = 'review was created';
@@ -69,6 +69,14 @@ const addReview = (request, response, body) => {
   }
   // no body
   return respondJSONMeta(request, response, responseCode);
+};
+
+const deleteReview = (request, response) => {
+  const responseJSON = {
+    message: 'Review was deleted!',
+  };
+
+  return respondJSON(request, response, 200, responseJSON);
 };
 
 const notFound = (request, response) => {
@@ -85,6 +93,7 @@ const notFoundMeta = (request, response) => respondJSONMeta(request, response, 4
 module.exports = {
   getTip,
   getTipMeta,
+  deleteReview,
   getReviewsMeta,
   getReviews,
   addReview,

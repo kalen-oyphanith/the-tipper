@@ -6,48 +6,68 @@
     <link rel="stylesheet" type="text/css" href="/style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.34/browser.min.js"></script>
     <script type="text/babel">
-
         const parseJSON = (xhr, reviewContent) => {
-      const obj = JSON.parse(xhr.responseText);
-
-      let d = new Date();
-      let dateString = `${d.getMonth() + 1}/${d.getDate()}/${d.getFullYear() % 100}`;
+      const obj = JSON.parse(xhr.response);
     
       if(obj.message) { // myData message status
         const p = document.createElement('p');
         p.textContent = `${obj.message}`;
         reviewContent.appendChild(p);
       } 
-        // https://www.w3schools.com/howto/howto_css_circles.asp    
+			
+        // https://www.w3schools.com/howto/howto_css_circles.asp
         if(obj.reviews) {
+          
+		const keys = Object.keys(obj.reviews); 
+        //console.log(keys); // ["Olive Garden", "Panera", ...]
+        const underKeys = Object.values(obj.reviews);
+                
+        const button = document.createElement('button');
+        button.innerHTML = "delete";
+        button.id = "deleteButton";
             
-        const nameobj = document.querySelector('#nameField').value;
-        const objName = obj.reviews[nameobj].name;
-        const objDescription = obj.reviews[nameobj].description;
-        console.log(obj.reviews);
-        console.log(obj.reviews[nameobj].length);
-            //for(let i = 0; i< obj.reviews.length)
-        const reviewContent = document.querySelector('#reviewContent');     
-        const hr = document.createElement('hr');
-        const h2 = document.createElement('h2');
-        const li = document.createElement('li');
-        const p = document.createElement('p');
-        h2.innerHTML = `<b>${nameobj}</b>`;
-        li.innerHTML = `${objDescription}`;
-        p.innerHTML = `Reviewed on ${dateString}`;
-        
-        const rating = document.querySelector('#rating').value;    
+		for(let i = 0; i< keys.length; i++) {
+			 
+            let review = obj.reviews[keys[i]];
+            //console.log(review); // {name: "Olive Garden", description: "it was okay" , rating: "3"}
+			const reviewContent = document.querySelector('#reviewContent');     
+            //const hr = document.createElement('hr');
+            const li = document.createElement('li');
+             
+            const deleteButton = document.querySelector('#deleteButton');
 
-        for (let i = 0; i < rating; i++ ) {
-            h2.innerHTML += `<span class="dot"></span>`;
-        }
+            li.innerHTML += `<h2><b>${review.name}</b></h2><p>${review.description}</p><p class="date">reviewed on ${review.date}</p>`;
             
-        reviewContent.appendChild(hr);        
-        reviewContent.appendChild(h2);        
-        reviewContent.appendChild(li);        
-        reviewContent.appendChild(p);        
-      }
-            
+            //reviewContent.appendChild(hr);  
+            li.appendChild(button);
+            reviewContent.appendChild(li);
+
+			for (let i = 0; i < review.rating; i++ ) { // if two or below: red     three: yellow     4 above: green
+                li.innerHTML += `<span class="dot"></span>`;
+			}
+
+            // https://www.w3schools.com/howto/tryit.asp?filename=tryhow_js_filter_list
+            const input = document.querySelector('#myInput');
+            const list = reviewContent.getElementsByTagName("li");
+            const filter = input.value.toLowerCase();
+
+            for (let i = 0; i < list.length; i++) {
+                const h2 = list[i].getElementsByTagName("h2")[0];
+                const txtValue = h2.textContent;
+                
+                if(txtValue.toLowerCase().indexOf(filter) > -1){
+                     list[i].style.display = "";
+                     // console.log("included");
+                } else {
+                    list[i].style.display = "none";
+                     // console.log("not included");
+                }
+            }
+
+		  }
+                deleteButton.onclick = deleteReview;
+         }
+
     };
 
     const handleResponse = (xhr, parseResponse) => {
@@ -96,7 +116,7 @@
       if (numPeople > 1){
           splitBill = totalBill / numPeople;
           paraTotal.innerHTML = `<p><b>Split bill with tip:</b> $${splitBill.toFixed(2)}</p>`;
-          console.log("split: " + splitBill.toFixed(2));
+          //console.log("split: " + splitBill.toFixed(2));
       } else {
           paraTotal.innerHTML = `<p><b>Total Bill with tip:</b> $${totalBill.toFixed(2)}</p>`;
       }
@@ -106,13 +126,14 @@
       return false;
     };
 
-
     const sendPost = (e, reviewForm) => {
       const nameAction = reviewForm.getAttribute('action'); 
       const nameMethod = reviewForm.getAttribute('method'); 
       
       const nameField = reviewForm.querySelector('#nameField');
       const descriptionField = reviewForm.querySelector('#descriptionField');
+      const ratingField = reviewForm.querySelector('#ratingField');
+      const dateField = reviewForm.querySelector('#dateField');
       
       const xhr = new XMLHttpRequest();
       xhr.open(nameMethod, nameAction); 
@@ -122,7 +143,7 @@
       
       xhr.onload = () => handleResponse(xhr, true);
 
-      const formData = `name=${nameField.value}&description=${descriptionField.value}`;
+      const formData = `name=${nameField.value}&description=${descriptionField.value}&rating=${ratingField.value}&date=${dateField.value}`;
       xhr.send(formData);
 
       e.preventDefault();
@@ -130,14 +151,18 @@
 
     };
 
-    const updateGet = (e, nameAction) => {
-      // Head request
-      const xhrHead = new XMLHttpRequest();
-      xhrHead.open("HEAD", nameAction); 
-      xhrHead.setRequestHeader('Accept', 'application/json');
-      xhrHead.onload = () => handleResponse(xhrHead, false);
-      xhrHead.send();
+    const deleteReview = (e) => {
+      const xhr = new XMLHttpRequest();
+      xhr.open("DELETE", "/deleteReview"); 
+      xhr.setRequestHeader('Accept', 'application/json');
+      xhr.onload = () => handleResponse(xhr, true);
+      xhr.send();
+    
+      e.preventDefault();
+      return false;
+    };
 
+    const updateGet = (e, nameAction) => {
       const xhr = new XMLHttpRequest();
       xhr.open("GET", nameAction); 
       xhr.setRequestHeader('Accept', 'application/json');
@@ -149,18 +174,25 @@
     };
 
     const init = () => {
+
       const reviewForm = document.querySelector('#reviewForm');
       const addReview = (e) => sendPost(e, reviewForm);
       reviewForm.addEventListener('submit', addReview);
         
-      const userForm = document.querySelector('#userForm');
+      const filledReviews = document.querySelector('#filledReviews');
       const getReviews = (e) => updateGet(e, "/getReviews");
-      userForm.addEventListener('submit', getReviews);      
+      filledReviews.addEventListener('submit', getReviews);      
     
+      const deleteReviews = (e) => deleteReview(e, "/deleteReview");
+      deleteButton.addEventListener('submit', deleteReviews);      
+
       const billInfo = document.querySelector('#billInfo');
       const getTip = (e) => getBill(e, billInfo);
       billInfo.addEventListener('submit', getTip);
-        
+      
+      myInput.addEventListener("submit", updateGet);
+
+
     }
 
     window.onload = init;
@@ -169,17 +201,21 @@
 
 <body>
     <section id="top">
-        <h1>The Tipper</h1>
+        <header>
+            <h1>The Tipper</h1>
+        </header>
+
+        <h3>Calculate Tip</h3>
         <form id="billInfo" action="/getTip" method="get">
 
             <label for="bill">Bill: </label>
             <input id="billField" type="number" name="bill" step="0.01" placeholder="Total bill amount" />
 
             <label for="tip">Tip: </label>
-            <input id="tipField" type="number" name="tip" placeholder="%" />
+            <input id="tipField" type="number" name="tip" min="5" placeholder="%" />
 
             <label for="numPeople">Split bill: </label>
-            <input id="numPeopleField" type="number" name="numPeople" min="0" max="30" placeholder="People" />
+            <input id="numPeopleField" type="number" name="numPeople" min="1" max="30" placeholder="People" />
 
             <input type="submit" value="Get Tip" />
         </form>
@@ -191,10 +227,10 @@
         <form id="reviewForm" action="/addReview" method="post">
 
             <label for="name">Location: </label>
-            <input id="nameField" type="text" name="name" placeholder="Restaurant name" />
+            <input id="nameField" type="text" name="name" placeholder="Restaurant name, City, State" />
 
-            <label for="name">Rating: </label>
-            <select name="service" id="rating">
+            <label for="rating">Rating: </label>
+            <select name="rating" id="ratingField">
                 <option value="1">1 star</option>
                 <option value="2">2 star</option>
                 <option value="3">3 star</option>
@@ -205,12 +241,14 @@
             <div>
                 <textarea rows="4" cols="50" id="descriptionField" name="description" placeholder="Describe your experience" form="usrform" id="descriptionField"></textarea>
             </div>
+            <input id="dateField" type="date" name="date">
 
             <input type="submit" value="+" />
         </form>
 
-        <form id="userForm" action="/getReviews" method="get">
+        <form id="filledReviews" action="/getReviews" method="get">
             <input type="submit" value="See Reviews" />
+            <input type="text" id="myInput" placeholder="Search for restaurant" />
         </form>
     </section>
     <section>

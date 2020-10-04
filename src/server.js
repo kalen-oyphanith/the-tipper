@@ -13,12 +13,17 @@ const urlStruct = {
     '/style.css': htmlHandler.getCSS,
     '/getReviews': myData.getReviews,
     '/getTip': myData.getTip,
+    '/deleteReview': myData.deleteReview,
     notFound: myData.notFound,
   },
   HEAD: {
     '/getReviews': myData.getReviewsMeta,
     '/getTipMeta': myData.getTipMeta,
     notFound: myData.notFoundMeta,
+  },
+  DELETE: {
+    '/deleteReview': myData.deleteReview,
+    notFound: myData.notFound,
   },
 };
 
@@ -40,6 +45,7 @@ const handlePost = (request, response, parsedUrl) => {
       const bodyString = Buffer.concat(body).toString();
       const bodyParams = query.parse(bodyString);
       myData.addReview(request, response, bodyParams);
+      console.log(bodyParams);
     });
   }
 };
@@ -52,7 +58,8 @@ const onRequest = (request, response) => {
 
   if (request.method === 'POST') {
     handlePost(request, response, parsedUrl);
-  } else if (request.method === 'GET' || request.method === 'HEAD') {
+    console.log(parsedUrl);
+  } else if (request.method === 'GET' || request.method === 'HEAD' || request.method === 'DELETE') {
     if (urlStruct[request.method][parsedUrl.pathname]) {
       urlStruct[request.method][parsedUrl.pathname](request, response);
     } else {

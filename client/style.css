@@ -93,7 +93,8 @@ input[type=submit]:hover {
     background-color: #45a049;
 }
 
-h2 {
+h2,
+h3 {
     font-size: 1.3em;
     font-family: 'Epilogue', sans-serif;
 }
@@ -107,4 +108,12 @@ h1 {
     /*    color: #DAF7A6;*/
     font-size: 2em;
     font-family: 'Epilogue', sans-serif;
+}
+
+.date {
+    font-size: .8em;
+}
+
+#delete {
+    float: right;
 }
