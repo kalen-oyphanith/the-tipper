@@ -98,8 +98,7 @@
         } else 
             // HEAD
             console.log('Meta Data Recieved');
-        }
-    };
+        };
 
     // Function to calculate tip
     // error prevention and bill info form
@@ -170,7 +169,7 @@
       const xhr = new XMLHttpRequest();
       xhr.open("DELETE", "/deleteReview"); 
       xhr.setRequestHeader('Accept', 'application/json');
-      xhr.onload = () => handleResponse(xhr);
+      xhr.onload = () => handleResponse(xhr, true);
       xhr.send();
     
       e.preventDefault();
