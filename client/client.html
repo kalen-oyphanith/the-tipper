@@ -4,6 +4,7 @@
 <head>
     <title>Our simple HTTP server</title>
     <link rel="stylesheet" type="text/css" href="/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Epilogue:wght@300;500&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.34/browser.min.js"></script>
     <script type="text/babel">
         const parseJSON = (xhr, reviewContent) => {
@@ -11,64 +12,54 @@
     
       if(obj.message) { // myData message status
         const p = document.createElement('p');
-        p.textContent = `${obj.message}`;
+        p.id = "status"
+        p.innerHTML = `${obj.message}`;
         reviewContent.appendChild(p);
       } 
 			
-        // https://www.w3schools.com/howto/howto_css_circles.asp
         if(obj.reviews) {
-          
-		const keys = Object.keys(obj.reviews); 
-        //console.log(keys); // ["Olive Garden", "Panera", ...]
-        const underKeys = Object.values(obj.reviews);
-                
-        const button = document.createElement('button');
-        button.innerHTML = "delete";
-        button.id = "deleteButton";
-            
-		for(let i = 0; i< keys.length; i++) {
-			 
-            let review = obj.reviews[keys[i]];
-            //console.log(review); // {name: "Olive Garden", description: "it was okay" , rating: "3"}
-			const reviewContent = document.querySelector('#reviewContent');     
-            //const hr = document.createElement('hr');
-            const li = document.createElement('li');
-             
-            const deleteButton = document.querySelector('#deleteButton');
+            const keys = Object.keys(obj.reviews); 
 
-            li.innerHTML += `<h2><b>${review.name}</b></h2><p>${review.description}</p><p class="date">reviewed on ${review.date}</p>`;
-            
-            //reviewContent.appendChild(hr);  
-            li.appendChild(button);
-            reviewContent.appendChild(li);
+            for(let i = 0; i< keys.length; i++) {
+                let review = obj.reviews[keys[i]];
+                          
+                const li = document.createElement('li');
+                const hr = document.createElement('hr');
 
-			for (let i = 0; i < review.rating; i++ ) { // if two or below: red     three: yellow     4 above: green
-                li.innerHTML += `<span class="dot"></span>`;
-			}
+                li.innerHTML += `<h2 id="locationHeader"><b>${review.name}</b></h2><p>${review.description}</p><p id="rating">${review.rating} out of 5</p>`;
+                // https://www.w3schools.com/howto/howto_css_circles.asp
+                for (let i = 0; i < review.rating; i++ ) {
+                    li.innerHTML += `<span class="dot"></span>`;
+                }
 
-            // https://www.w3schools.com/howto/tryit.asp?filename=tryhow_js_filter_list
-            const input = document.querySelector('#myInput');
-            const list = reviewContent.getElementsByTagName("li");
-            const filter = input.value.toLowerCase();
+                li.innerHTML += `<p class="date">reviewed on ${review.date}</p>`;
 
-            for (let i = 0; i < list.length; i++) {
-                const h2 = list[i].getElementsByTagName("h2")[0];
-                const txtValue = h2.textContent;
-                
-                if(txtValue.toLowerCase().indexOf(filter) > -1){
-                     list[i].style.display = "";
-                     // console.log("included");
-                } else {
-                    list[i].style.display = "none";
-                     // console.log("not included");
+                reviewContent.appendChild(hr);
+                reviewContent.appendChild(li); 
+                // https://www.w3schools.com/howto/tryit.asp?filename=tryhow_js_filter_list
+                const input = document.querySelector('#myInput');
+                const list = reviewContent.getElementsByTagName("li");
+                const filter = input.value.toLowerCase();
+
+                for (let i = 0; i < list.length; i++) {
+                    const h2 = list[i].getElementsByTagName("h2")[0];
+                    const text = h2.textContent;
+
+                    if(text.toLowerCase().indexOf(filter) > -1){
+                         list[i].style.display = "";
+                         // console.log("included");
+                    } else {
+                        list[i].style.display = "none";
+                         // console.log("not included");
+                    }
                 }
             }
-
-		  }
+                const deleteButton =  document.querySelector("#deleteButton");
                 deleteButton.onclick = deleteReview;
-         }
-
-    };
+                
+        }
+                
+    };  
 
     const handleResponse = (xhr, parseResponse) => {
       const reviewContent = document.querySelector('#reviewContent');
@@ -112,14 +103,17 @@
       let totalBill = (parseFloat(billAmount) + totalTip);
         
       let splitBill;
-        
-      if (numPeople > 1){
-          splitBill = totalBill / numPeople;
-          paraTotal.innerHTML = `<p><b>Split bill with tip:</b> $${splitBill.toFixed(2)}</p>`;
-          //console.log("split: " + splitBill.toFixed(2));
+      
+      if(billAmount.length == 0 || tipPercent.length == 0) {
+          paraTotal.innerHTML = `<p>You must put in the bill and tip amount.</p>`;
       } else {
-          paraTotal.innerHTML = `<p><b>Total Bill with tip:</b> $${totalBill.toFixed(2)}</p>`;
-      }
+          if (numPeople > 1){
+              splitBill = totalBill / numPeople;
+              paraTotal.innerHTML = `<p><b>Total Bill with tip added:</b> $${totalBill.toFixed(2)}</p><div><p><b>Split bill with tip added:</b> $${splitBill.toFixed(2)}</p></div> `;
+          } else {
+              paraTotal.innerHTML = `<p><b>Total Bill with tip:</b> $${totalBill.toFixed(2)}</p>`;
+          }
+     }
 
       updateGet(e, "/getTip");
       e.preventDefault();
@@ -148,7 +142,6 @@
 
       e.preventDefault();
       return false;
-
     };
 
     const deleteReview = (e) => {
@@ -177,21 +170,17 @@
 
       const reviewForm = document.querySelector('#reviewForm');
       const addReview = (e) => sendPost(e, reviewForm);
-      reviewForm.addEventListener('submit', addReview);
+      reviewForm.addEventListener('submit', addReview);      
         
       const filledReviews = document.querySelector('#filledReviews');
       const getReviews = (e) => updateGet(e, "/getReviews");
       filledReviews.addEventListener('submit', getReviews);      
-    
-      const deleteReviews = (e) => deleteReview(e, "/deleteReview");
-      deleteButton.addEventListener('submit', deleteReviews);      
 
       const billInfo = document.querySelector('#billInfo');
       const getTip = (e) => getBill(e, billInfo);
       billInfo.addEventListener('submit', getTip);
       
       myInput.addEventListener("submit", updateGet);
-
 
     }
 
@@ -200,24 +189,39 @@
 </head>
 
 <body>
-    <section id="top">
-        <header>
-            <h1>The Tipper</h1>
-        </header>
+    <header>
+        <h1>The Tipper</h1>
+    </header>
+    <section id="formContent">
+        <a id="topButton" href="#">&#8679;</a>
+        <p id="tipperDescription">Welcome to <b>The Tipper</b>! It will calculate how much you want to tip on a bill at a restaurant or even on a GrubHub order.</p>
+        <p id="reviewPara">Create a review on where you've eaten to remember your experience! If you'd like to search for an old review, search for it by typing in the restaurant name and pressing enter. <b>Clear the search bar to see all reviews again</b>!</p>
+        <details>
+            <summary>More on Tipping</summary>
+            <div id="detailsInfo">
+                <h4>Tipping Norms</h4>
+                <p>In North America, it is typical for a person to tip between 10 to 15 percent on a bill at a restaurant as a service fee.</p>
 
+                <ul id="tippingInfo">
+                    <li>If the service was mediocre, people generally tip 10%</li>
+                    <li>If the service was standard, people generally tip 15%</li>
+                    <li>If the service was great, people generally tip 20% or above if they're feeling generous.</li>
+                </ul>
+                <p>But it is always up to you!</p>
+            </div>
+        </details>
         <h3>Calculate Tip</h3>
+
         <form id="billInfo" action="/getTip" method="get">
+            <label>Bill: </label>
+            <input id="billField" type="number" name="bill" min="0" step="0.01" placeholder="Total bill amount" />
 
-            <label for="bill">Bill: </label>
-            <input id="billField" type="number" name="bill" step="0.01" placeholder="Total bill amount" />
-
-            <label for="tip">Tip: </label>
+            <label>Tip: </label>
             <input id="tipField" type="number" name="tip" min="5" placeholder="%" />
 
-            <label for="numPeople">Split bill: </label>
+            <label>Split bill: </label>
             <input id="numPeopleField" type="number" name="numPeople" min="1" max="30" placeholder="People" />
-
-            <input type="submit" value="Get Tip" />
+            <input type="submit" value="Calculate" />
         </form>
 
         <section id="billContent">
@@ -226,35 +230,45 @@
         <h3>Add Reviews</h3>
         <form id="reviewForm" action="/addReview" method="post">
 
-            <label for="name">Location: </label>
+            <label>Location: </label>
             <input id="nameField" type="text" name="name" placeholder="Restaurant name, City, State" />
 
-            <label for="rating">Rating: </label>
-            <select name="rating" id="ratingField">
-                <option value="1">1 star</option>
-                <option value="2">2 star</option>
-                <option value="3">3 star</option>
-                <option value="4">4 star</option>
-                <option value="5">5 star</option>
-            </select>
+            <div>
+                <label>Rating: </label>
+                <select name="rating" id="ratingField">
+                    <option value="1">1 star</option>
+                    <option value="2">2 star</option>
+                    <option value="3">3 star</option>
+                    <option value="4">4 star</option>
+                    <option value="5">5 star</option>
+                </select>
+            </div>
 
             <div>
-                <textarea rows="4" cols="50" id="descriptionField" name="description" placeholder="Describe your experience" form="usrform" id="descriptionField"></textarea>
+                <textarea rows="4" cols="50" id="descriptionField" name="description" placeholder="Describe your experience..."></textarea>
             </div>
             <input id="dateField" type="date" name="date">
-
-            <input type="submit" value="+" />
+            <input id="addButton" type="submit" value="Add" />
         </form>
+
 
         <form id="filledReviews" action="/getReviews" method="get">
             <input type="submit" value="See Reviews" />
-            <input type="text" id="myInput" placeholder="Search for restaurant" />
+            <input id="deleteButton" type="submit" value="Delete All Reviews" />
+            <input type="text" id="myInput" placeholder="Search for review" />
         </form>
+
     </section>
     <section>
         <ul id="reviewContent">
         </ul>
     </section>
+
+    <div id="foot">
+        <footer>
+            <p>&copy; Kalen Oyphanith October 2020</p>
+        </footer>
+    </div>
 </body>
 
 </html>

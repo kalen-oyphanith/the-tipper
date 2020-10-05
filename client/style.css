@@ -1,14 +1,31 @@
 /*https://www.w3schools.com/css/css_form.asp.dot */
 /*https://www.w3docs.com/snippets/css/how-to-remove-and-style-the-border-outline-around-text-input-boxes-in-google-chrome.html*/
 /*https://fonts.google.com/specimen/Epilogue?preview.text=The%20Tipper&preview.text_type=custom&sidebar.open=true&selection.family=Epilogue:wght@300;500*/
+@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
 
-<link href="https://fonts.googleapis.com/css2?family=Epilogue:wght@300;500&display=swap"rel="stylesheet" > * {
+* {
     box-sizing: border-box;
 }
 
+* {
+    font-family: 'Roboto', sans-serif;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
 body {
-    margin: 0% 10% 0% 10%;
+    background-color: white;
+    margin: 0px;
+    padding: 0px;
+}
+
+#formContent,
+#reviewContent {
+    margin: 0% 20% 0% 20%;
     background-color: #F5F5F5;
+    padding: 0% 5% 0% 5%;
 }
 
 .dot {
@@ -26,22 +43,20 @@ ul {
 
 li {
     font-size: 1.2em;
-    font-family: 'Epilogue', sans-serif;
 }
 
 textarea {
-    width: 40%;
+    width: 50%;
     padding: 12px;
     border: 1px solid #ccc;
     border-radius: 4px;
     resize: vertical;
-    font-family: 'Epilogue', sans-serif;
 }
 
 label {
     padding: 12px 12px 12px 0;
     display: inline-block;
-    font-family: 'Epilogue', sans-serif;
+    font-weight: bold;
 }
 
 input {
@@ -55,17 +70,41 @@ input {
     cursor: pointer;
     border: none;
     text-decoration: none;
-    margin: 4px 2px;
+    margin: 2px 2px;
     border-radius: 12px;
 }
 
+#billField {
+    width: 20%;
+}
+
+#tipField {
+    width: 10%;
+}
+
+#numPeopleField {
+    width: 15%;
+}
+
+#rating {
+    font-size: .6em;
+}
+
+#reviewForm #addButton {
+    width: auto;
+}
+
+#reviewForm #dateField {
+    width: 50%;
+}
+
 input[type=submit]:hover {
-    background-color: #45a049;
+    background-color: #149179;
 }
 
 #content {
     border-radius: 5px;
-    background-color: green;
+    background-color: #1abc9c;
     padding: 20px;
 }
 
@@ -74,46 +113,133 @@ select {
     border: none;
     border-radius: 12px;
     background-color: #f1f1f1;
-    float: clear;
-    font-family: 'Epilogue', sans-serif;
+}
+
+#filledReviews {
+    padding-top: 3%;
 }
 
 input[type=submit] {
-    background-color: #4CAF50;
+    background-color: #1abc9c;
     border: none;
     color: white;
     padding: 10px 20px;
     text-decoration: none;
-    margin: 4px 2px;
+    margin: 7px 2px;
     cursor: pointer;
     border-radius: 12px;
 }
 
-input[type=submit]:hover {
-    background-color: #45a049;
+input[type=submit]:hover,
+#topButton:hover {
+    background-color: #149179;
+}
+
+#reviewForm input {
+    width: 40%;
+}
+
+#status {
+    padding: 2% 0% 2% 0%;
+}
+
+#topButton,
+#topButton:active {
+    text-decoration: none;
+    cursor: pointer;
+    background: #1abc9c;
+    color: white;
+    text-align: center;
+    font-size: 1.5em;
+    padding: 10px 10px;
+    border-radius: 12px;
+    position: fixed;
+    bottom: 30px;
+    right: 3%;
+}
+
+#deleteButton:hover {
+    background-color: #ebebeb;
 }
 
 h2,
 h3 {
     font-size: 1.3em;
-    font-family: 'Epilogue', sans-serif;
 }
 
-p {
-    font-family: 'Epilogue', sans-serif;
+h4 {
+    font-size: 1.3em;
+}
+
+#tipperDescription {
+    padding-top: 3%;
+    font-size: 1.3em;
+    line-height: 1.5;
+}
+
+details {
+    font-size: 1.3em;
+    color: #1abc9c;
+}
+
+#detailsInfo {
+    padding: 0% 2% 2% 0%;
+    color: black;
+}
+
+#tippingInfo {
+    font-size: .9em;
+}
+
+#tippingInfo li {
     font-size: 1em;
 }
 
+#detailsInfo p {
+    padding: 1% 2% 1% 2%;
+    font-size: .9em;
+    color: black;
+}
+
+#reviewPara {
+    padding-bottom: 2%;
+    font-size: 1.3em;
+    line-height: 1.5;
+}
+
+p {
+    /*    font-family: 'Epilogue', sans-serif;*/
+    font-family: 'Roboto', sans-serif;
+    font-size: 1em;
+    line-height: 1.5;
+}
+
 h1 {
-    /*    color: #DAF7A6;*/
     font-size: 2em;
     font-family: 'Epilogue', sans-serif;
 }
 
 .date {
     font-size: .8em;
+    padding-bottom: 3%;
 }
 
-#delete {
+#deleteButton {
+    background-color: white;
+    color: red;
     float: right;
+}
+
+header {
+    background-color: #1abc9c;
+    padding: 5px 20px;
+    color: white;
+    font-size: 1em;
+}
+
+#foot {
+    padding-top: 8%;
+    text-align: center;
+    font-size: .7em;
+    color: black;
 }
