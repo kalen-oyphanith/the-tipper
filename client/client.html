@@ -7,6 +7,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Epilogue:wght@300;500&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.34/browser.min.js"></script>
     <script type="text/babel">
+
+        //function to parse our response
         const parseJSON = (xhr, reviewContent) => {
       const obj = JSON.parse(xhr.response);
     
@@ -16,13 +18,16 @@
         p.innerHTML = `${obj.message}`;
         reviewContent.appendChild(p);
       } 
-			
+        //if reviews in response, display
         if(obj.reviews) {
-            const keys = Object.keys(obj.reviews); 
-
+            const keys = Object.keys(obj.reviews); // top keys ["Olive Garden", "Panera", ...]
+            
+            // loop through keys
             for(let i = 0; i< keys.length; i++) {
+                // {name: "Olive Garden", description: "it was okay" , rating: "3"}
                 let review = obj.reviews[keys[i]];
-                          
+                
+                // create html to fill
                 const li = document.createElement('li');
                 const hr = document.createElement('hr');
 
@@ -35,17 +40,17 @@
                 li.innerHTML += `<p class="date">reviewed on ${review.date}</p>`;
 
                 reviewContent.appendChild(hr);
-                reviewContent.appendChild(li); 
-                // https://www.w3schools.com/howto/tryit.asp?filename=tryhow_js_filter_list
+                reviewContent.appendChild(li);
+                
                 const input = document.querySelector('#myInput');
                 const list = reviewContent.getElementsByTagName("li");
-                const filter = input.value.toLowerCase();
-
+                const filter = input.value.toLowerCase(); // make it easier to compare, search element
+                
+                // loop through all list elements
                 for (let i = 0; i < list.length; i++) {
-                    const h2 = list[i].getElementsByTagName("h2")[0];
-                    const text = h2.textContent;
-
-                    if(text.toLowerCase().indexOf(filter) > -1){
+                    const h2 = list[i].getElementsByTagName("h2")[0]; // get the h2 (hold location): <h2 id="locationHeader" ... </h2>
+                    const text = h2.textContent; // text of heading
+                    if(text.toLowerCase().indexOf(filter) > -1){ // returns index of first specified value
                          list[i].style.display = "";
                          // console.log("included");
                     } else {
@@ -54,16 +59,18 @@
                     }
                 }
             }
+                // deletes all reviews
                 const deleteButton =  document.querySelector("#deleteButton");
-                deleteButton.onclick = deleteReview;
-                
+                deleteButton.onclick = deleteReview;  
         }
                 
     };  
 
+    //function to handle our response
     const handleResponse = (xhr, parseResponse) => {
       const reviewContent = document.querySelector('#reviewContent');
       
+      //check the status code
       switch(xhr.status) {
         case 200: 
           reviewContent.innerHTML = `<b>Success!</b>`;
@@ -86,12 +93,16 @@
       }
 
         if(parseResponse) {
+            // parse response
             parseJSON(xhr, reviewContent);
-        } else {
+        } else 
+            // HEAD
             console.log('Meta Data Recieved');
         }
     };
 
+    // Function to calculate tip
+    // error prevention and bill info form
     const getBill = (e, billInfo) => {
       const billAmount = document.querySelector("#billField").value;
       const tipPercent = document.querySelector("#tipField").value;
@@ -104,39 +115,49 @@
         
       let splitBill;
       
+      // if values are empty, tell user to put values in input
       if(billAmount.length == 0 || tipPercent.length == 0) {
           paraTotal.innerHTML = `<p>You must put in the bill and tip amount.</p>`;
       } else {
+          // if bill is split between people
           if (numPeople > 1){
               splitBill = totalBill / numPeople;
               paraTotal.innerHTML = `<p><b>Total Bill with tip added:</b> $${totalBill.toFixed(2)}</p><div><p><b>Split bill with tip added:</b> $${splitBill.toFixed(2)}</p></div> `;
           } else {
+              // no split
               paraTotal.innerHTML = `<p><b>Total Bill with tip:</b> $${totalBill.toFixed(2)}</p>`;
           }
      }
-
+        
+      // make get request
       updateGet(e, "/getTip");
       e.preventDefault();
       return false;
     };
 
+    // send POST request
     const sendPost = (e, reviewForm) => {
-      const nameAction = reviewForm.getAttribute('action'); 
-      const nameMethod = reviewForm.getAttribute('method'); 
+      const nameAction = reviewForm.getAttribute('action'); // url
+      const nameMethod = reviewForm.getAttribute('method'); // request method
       
       const nameField = reviewForm.querySelector('#nameField');
       const descriptionField = reviewForm.querySelector('#descriptionField');
       const ratingField = reviewForm.querySelector('#ratingField');
       const dateField = reviewForm.querySelector('#dateField');
       
+      // create a new Ajax request
       const xhr = new XMLHttpRequest();
       xhr.open(nameMethod, nameAction); 
-        
+    
+      //set our request type to x-www-form-urlencoded
+      //which is one of the common types of form data. 
       xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
       xhr.setRequestHeader ('Accept', 'application/json');
       
+      //set our function to handle the response
       xhr.onload = () => handleResponse(xhr, true);
-
+      
+      //build our x-www-form-urlencoded format.
       const formData = `name=${nameField.value}&description=${descriptionField.value}&rating=${ratingField.value}&date=${dateField.value}`;
       xhr.send(formData);
 
@@ -144,21 +165,25 @@
       return false;
     };
 
+    // send DELETE request for reviews
     const deleteReview = (e) => {
       const xhr = new XMLHttpRequest();
       xhr.open("DELETE", "/deleteReview"); 
       xhr.setRequestHeader('Accept', 'application/json');
-      xhr.onload = () => handleResponse(xhr, true);
+      xhr.onload = () => handleResponse(xhr);
       xhr.send();
     
       e.preventDefault();
       return false;
     };
 
+    // send GET request for reviews
     const updateGet = (e, nameAction) => {
       const xhr = new XMLHttpRequest();
       xhr.open("GET", nameAction); 
       xhr.setRequestHeader('Accept', 'application/json');
+      
+      //set our function to handle the response
       xhr.onload = () => handleResponse(xhr, true);
       xhr.send();
     
@@ -166,10 +191,15 @@
       return false;
     };
 
+    // calls function when window opens
     const init = () => {
 
       const reviewForm = document.querySelector('#reviewForm');
-      const addReview = (e) => sendPost(e, reviewForm);
+      const addReview = (e) => { // handler
+          sendPost(e, reviewForm);
+          reviewForm.reset();  // reset inputs              
+      };
+      //attach submit event (for clicking submit or hitting enter)
       reviewForm.addEventListener('submit', addReview);      
         
       const filledReviews = document.querySelector('#filledReviews');
